@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ask What Matters - Neuro-Symbolic Trial Screening Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 380px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 360px;
+            }
+        }
+        .step-card {
+            transition: all 0.25s ease-in-out;
+        }
+        .step-card:hover {
+            transform: translateY(-2px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+    <!-- Chosen Palette: Warm Clinical Slate & Indigo -->
+    <!-- Application Structure Plan: A 6-tab interactive SPA architecture designed to transform the academic project brief into an explorable system blueprint. Features: 1) Executive Summary & Guide Pitch, 2) Interactive System Architecture Visualizer, 3) Real-Time System Demo Simulator (allowing users to test active questioning & Z3 state updates), 4) Research Matrix & Novelty Defense Guide, 5) Datasets & Benchmarks Dashboard with Chart.js analytics, and 6) Interactive 6-Phase Execution Roadmap with working task checklists. -->
+    <!-- Visualization & Content Choices: 
+         - System Working Diagram -> Custom Interactive HTML/CSS Node Flow & Canvas Visualizer -> Clickable step nodes with data payloads -> Illustrates neuro-symbolic pipeline without SVG.
+         - Interactive Demo Simulator -> Dynamic State Machine in Vanilla JS -> Real-time solver updates (SAT/UNSAT/UNKNOWN count transitions) based on simulated patient responses -> Demonstrates active questioning & human deferral.
+         - Datasets Breakdown -> Chart.js Bar Chart -> Tabular switching & hover tooltips -> Visualizes TREC, Chia, CADEC scale -> Chart.js on Canvas.
+         - Execution Roadmap -> Interactive Task Checklist with Progress Bar -> Persists user state in JS -> Guides step-by-step completion. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <header class="bg-indigo-900 text-white shadow-md border-b border-indigo-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-inner border border-indigo-400">
+                    &#9883;
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-indigo-100 leading-tight">Ask What Matters</h1>
+                    <p class="text-xs text-indigo-300 font-medium">Neuro-Symbolic Clinical Trial Screening Agent & Active Questioning Platform</p>
+                </div>
+            </div>
+            <nav class="flex flex-wrap gap-1 bg-indigo-950/60 p-1 rounded-xl border border-indigo-800/80 text-xs sm:text-sm font-medium">
+                <button onclick="switchTab('overview')" id="tab-overview" class="nav-btn px-3 py-1.5 rounded-lg text-indigo-200 hover:text-white transition">Overview & Pitch</button>
+                <button onclick="switchTab('architecture')" id="tab-architecture" class="nav-btn px-3 py-1.5 rounded-lg text-indigo-200 hover:text-white transition">Architecture Diagram</button>
+                <button onclick="switchTab('simulator')" id="tab-simulator" class="nav-btn px-3 py-1.5 rounded-lg text-indigo-200 hover:text-white transition bg-indigo-700 text-white shadow-sm">Interactive Live Demo</button>
+                <button onclick="switchTab('research')" id="tab-research" class="nav-btn px-3 py-1.5 rounded-lg text-indigo-200 hover:text-white transition">Research & Defense</button>
+                <button onclick="switchTab('datasets')" id="tab-datasets" class="nav-btn px-3 py-1.5 rounded-lg text-indigo-200 hover:text-white transition">Datasets & Metrics</button>
+                <button onclick="switchTab('roadmap')" id="tab-roadmap" class="nav-btn px-3 py-1.5 rounded-lg text-indigo-200 hover:text-white transition">Execution Roadmap</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+
+        <section id="sec-overview" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 space-y-4">
+                <div class="border-b border-slate-100 pb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    <div>
+                        <span class="inline-block px-2.5 py-1 text-xs font-semibold bg-indigo-100 text-indigo-800 rounded-full mb-2">BTP Project Brief & Strategy</span>
+                        <h2 class="text-2xl font-bold text-slate-900">Project Overview & Guide Summary</h2>
+                        <p class="text-sm text-slate-600 mt-1">Domain: Health Informatics &bull; Conversational AI &bull; Neuro-Symbolic AI</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-semibold rounded-lg border border-emerald-200 flex items-center gap-1">
+                            &#10004; Z3 Logic Verified
+                        </span>
+                        <span class="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-semibold rounded-lg border border-amber-200 flex items-center gap-1">
+                            &#9888; Risk Control Active
+                        </span>
+                    </div>
+                </div>
+
+                <p class="text-slate-700 text-sm sm:text-base leading-relaxed">
+                    Existing clinical-trial matching platforms assume a patient's medical record is completely known and apply vector similarity or LLMs to rank trials. However, real-world patient data is almost always incomplete, and traditional models struggle with hard logical constraints, negations, and exact thresholds. <strong>Ask What Matters</strong> treats patient information as a partially known state, using Z3 constraint satisfaction to classify trials into <code>SAT</code> (potentially eligible), <code>UNSAT</code> (ineligible), or <code>UNKNOWN</code> (missing information), actively asking questions that yield the highest reduction in uncertainty.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                    <div class="bg-indigo-50/70 border border-indigo-100 rounded-xl p-4 space-y-2">
+                        <div class="text-indigo-800 font-semibold text-sm flex items-center gap-2">
+                            <span class="text-base">&#9878;</span> Contribution 1: Logic Constraints
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Shifts from "how similar is this patient to this trial" to hard logical evaluation: determining which inclusion/exclusion rules are satisfied, violated, or missing.
+                        </p>
+                    </div>
+                    <div class="bg-emerald-50/70 border border-emerald-100 rounded-xl p-4 space-y-2">
+                        <div class="text-emerald-800 font-semibold text-sm flex items-center gap-2">
+                            <span class="text-base">&#128161;</span> Contribution 2: Active Info Gain
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Instead of asking static forms, the system calculates which missing patient variable resolves the highest number of <code>UNKNOWN</code> trial states.
+                        </p>
+                    </div>
+                    <div class="bg-amber-50/70 border border-amber-100 rounded-xl p-4 space-y-2">
+                        <div class="text-amber-800 font-semibold text-sm flex items-center gap-2">
+                            <span class="text-base">&#128737;</span> Contribution 3: Guaranteed Referral
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Incorporates a Conformal Risk Control layer to safely defer high-uncertainty or borderline cases to human trial coordinators rather than making unsafe decisions.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-2xl p-6 shadow-md border border-slate-800 space-y-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold text-sm">
+                        1m
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">One-Minute Pitch for Your Project Guide</h3>
+                        <p class="text-xs text-indigo-300">Use this exact pitch during panel evaluations or supervisor meetings</p>
+                    </div>
+                </div>
+                <blockquote class="bg-slate-800/80 border-l-4 border-indigo-500 p-4 rounded-r-xl text-xs sm:text-sm text-slate-200 italic leading-relaxed">
+                    "Our project improves clinical-trial matching by treating eligibility as a logical constraint problem rather than a basic similarity-ranking problem. Existing systems take a fixed patient record and rank trials. Our system assumes patient information is partially known. It converts trial eligibility criteria into formal constraints using an LLM, evaluates them with the Z3 SMT solver into SAT, UNSAT, or UNKNOWN, and then actively asks the patient the question expected to resolve the maximum number of uncertain trials. Finally, rather than forcing uncertain cases into an arbitrary decision, it defers them with unresolved logical constraints to a human coordinator with calibrated statistical safety guarantees."
+                </blockquote>
+            </div>
+
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 space-y-4">
+                <h3 class="text-lg font-bold text-slate-900">Project Execution Scope & Feasibility Tiers</h3>
+                <p class="text-xs text-slate-600">Depending on time and compute constraints, the system can be delivered in three well-defined tiers:</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="border border-slate-200 rounded-xl p-4 bg-slate-50 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">Tier 1</span>
+                            <span class="px-2 py-0.5 bg-slate-200 text-slate-800 text-[10px] font-semibold rounded">Baseline MVP</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-sm">Minimal Viable Version</h4>
+                        <p class="text-xs text-slate-600">Three-valued logic system (SAT/UNSAT/UNKNOWN). Converts criteria to Z3 logic and evaluates against TREC 2021/2022 patient profiles.</p>
+                    </div>
+                    <div class="border border-indigo-200 rounded-xl p-4 bg-indigo-50/50 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-indigo-700 uppercase tracking-wider">Tier 2</span>
+                            <span class="px-2 py-0.5 bg-indigo-200 text-indigo-800 text-[10px] font-semibold rounded">Recommended</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-sm">Reduced Version</h4>
+                        <p class="text-xs text-slate-600">Adds the active dynamic questioning layer using greedy information gain calculation without the statistical conformal calibration layer.</p>
+                    </div>
+                    <div class="border border-emerald-200 rounded-xl p-4 bg-emerald-50/50 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider">Tier 3</span>
+                            <span class="px-2 py-0.5 bg-emerald-200 text-emerald-800 text-[10px] font-semibold rounded">Full Scope</span>
+                        </div>
+                        <h4 class="font-bold text-slate-900 text-sm">Full System</h4>
+                        <p class="text-xs text-slate-600">Complete pipeline: BM25/MedCPT retrieval, Z3 constraint engine, Information-Gain dynamic agent, CADEC lay conversion, and Conformal Risk Control.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-architecture" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 space-y-4">
+                <div>
+                    <span class="inline-block px-2.5 py-1 text-xs font-semibold bg-indigo-100 text-indigo-800 rounded-full mb-2">Technical Flow & Architecture</span>
+                    <h2 class="text-2xl font-bold text-slate-900">System Working Architecture Diagram</h2>
+                    <p class="text-sm text-slate-600 mt-1">This diagram outlines the complete backend data pipeline and neuro-symbolic reasoning loop. Click on any step to inspect the exact data payloads, toolchains, and mathematical logic.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
+                    <div class="lg:col-span-7 space-y-3">
+                        <div class="bg-slate-900 rounded-xl p-4 text-white space-y-4">
+                            <div class="text-xs font-semibold text-indigo-400 uppercase tracking-wider flex justify-between items-center">
+                                <span>Interactive Architecture Pipeline Visualizer</span>
+                                <span class="text-[10px] bg-slate-800 px-2 py-0.5 rounded text-slate-300">Click node for details</span>
+                            </div>
+
+                            <div class="space-y-2">
+                                <div onclick="selectArchStep(1)" id="arch-node-1" class="step-card bg-slate-800 hover:bg-slate-750 border border-slate-700 p-3 rounded-lg cursor-pointer flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-7 h-7 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center">1</div>
+                                        <div>
+                                            <div class="text-xs font-bold text-slate-100">Step 1: Clinical Trials Data Acquisition</div>
+                                            <div class="text-[10px] text-slate-400">ClinicalTrials.gov API v2 / TREC CT / Chia Dataset</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs text-blue-400 font-mono">&rarr; Data Raw</span>
+                                </div>
+
+                                <div class="text-center text-slate-500 text-xs my-0.5">&#129155;</div>
+
+                                <div onclick="selectArchStep(2)" id="arch-node-2" class="step-card bg-slate-800 hover:bg-slate-750 border border-slate-700 p-3 rounded-lg cursor-pointer flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-7 h-7 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center">2</div>
+                                        <div>
+                                            <div class="text-xs font-bold text-slate-100">Step 2: Initial Retrieval Stage</div>
+                                            <div class="text-[10px] text-slate-400">BM25 / MedCPT &rarr; Narrows search to ~200 trials</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs text-indigo-400 font-mono">Top ~200</span>
+                                </div>
+
+                                <div class="text-center text-slate-500 text-xs my-0.5">&#129155;</div>
+
+                                <div onclick="selectArchStep(3)" id="arch-node-3" class="step-card bg-slate-800 hover:bg-slate-750 border border-slate-700 p-3 rounded-lg cursor-pointer flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-7 h-7 rounded-full bg-purple-600 text-white font-bold text-xs flex items-center justify-center">3</div>
+                                        <div>
+                                            <div class="text-xs font-bold text-slate-100">Step 3: LLM Autoformalization</div>
+                                            <div class="text-[10px] text-slate-400">Translates criteria to JSON logical constraints</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs text-purple-400 font-mono">AST Rules</span>
+                                </div>
+
+                                <div class="text-center text-slate-500 text-xs my-0.5">&#129155;</div>
+
+                                <div onclick="selectArchStep(4)" id="arch-node-4" class="step-card bg-slate-800 hover:bg-slate-750 border border-slate-700 p-3 rounded-lg cursor-pointer flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-7 h-7 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center">4</div>
+                                        <div>
+                                            <div class="text-xs font-bold text-slate-100">Step 4: Z3 SMT Constraint Solving</div>
+                                            <div class="text-[10px] text-slate-400">Evaluates known patient state &rarr; SAT / UNSAT / UNKNOWN</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs text-emerald-400 font-mono">3-Logic</span>
+                                </div>
+
+                                <div class="text-center text-slate-500 text-xs my-0.5">&#129155;</div>
+
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div onclick="selectArchStep(5)" id="arch-node-5" class="step-card bg-slate-800 hover:bg-slate-750 border border-slate-700 p-3 rounded-lg cursor-pointer">
+                                        <div class="flex items-center space-x-2 mb-1">
+                                            <div class="w-5 h-5 rounded-full bg-amber-600 text-white font-bold text-[10px] flex items-center justify-center">5</div>
+                                            <div class="text-xs font-bold text-amber-300">Information Gain</div>
+                                        </div>
+                                        <p class="text-[10px] text-slate-400">Calculates max uncertainty reduction & asks patient</p>
+                                    </div>
+
+                                    <div onclick="selectArchStep(6)" id="arch-node-6" class="step-card bg-slate-800 hover:bg-slate-750 border border-slate-700 p-3 rounded-lg cursor-pointer">
+                                        <div class="flex items-center space-x-2 mb-1">
+                                            <div class="w-5 h-5 rounded-full bg-rose-600 text-white font-bold text-[10px] flex items-center justify-center">6</div>
+                                            <div class="text-xs font-bold text-rose-300">Risk Referral</div>
+                                        </div>
+                                        <p class="text-[10px] text-slate-400">Conformal calibration & human review hand-off</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-5 bg-slate-100 rounded-xl p-5 border border-slate-200 flex flex-col justify-between">
+                        <div class="space-y-3" id="arch-detail-container">
+                            <!-- Dynamic Arch Detail Content -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-simulator" class="tab-content space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 space-y-4">
+                <div>
+                    <span class="inline-block px-2.5 py-1 text-xs font-semibold bg-emerald-100 text-emerald-800 rounded-full mb-2">Interactive Demonstration</span>
+                    <h2 class="text-2xl font-bold text-slate-900">Real-Time Interactive System Demo</h2>
+                    <p class="text-sm text-slate-600 mt-1">Experience how the active questioning agent interacts with a patient, executes BM25 retrieval, evaluates constraints via Z3 logic, recalculates uncertainty, and refers safe outputs.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-7 bg-slate-900 rounded-2xl border border-slate-800 p-5 flex flex-col justify-between h-[520px]">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                                <span class="text-xs text-slate-400 font-mono ml-2">AskWhatMatters_Chat_Agent_v1.0.py</span>
+                            </div>
+                            <button onclick="resetDemoSimulator()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded border border-slate-700">Reset Simulator</button>
+                        </div>
+
+                        <div id="sim-chat-box" class="flex-grow overflow-y-auto custom-scrollbar my-4 space-y-3 text-xs sm:text-sm pr-2">
+                            <!-- Dynamic Chat Messages -->
+                        </div>
+
+                        <div id="sim-input-box" class="pt-2 border-t border-slate-800 space-y-2">
+                            <p id="sim-prompt-label" class="text-xs text-indigo-300 font-medium"></p>
+                            <div id="sim-actions-container" class="flex flex-wrap gap-2">
+                                <!-- Dynamic Action Buttons -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-5 space-y-4">
+                        <div class="bg-white rounded-xl p-4 border border-slate-200 shadow-sm space-y-3">
+                            <h3 class="text-sm font-bold text-slate-800 flex items-center justify-between">
+                                <span>Z3 Solver Dynamic State</span>
+                                <span id="sim-step-badge" class="px-2 py-0.5 bg-slate-100 text-slate-700 text-[10px] font-mono rounded">Step 0 / 4</span>
+                            </h3>
+
+                            <div class="grid grid-cols-3 gap-2 text-center">
+                                <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-2.5">
+                                    <div id="count-sat" class="text-2xl font-extrabold text-emerald-700">0</div>
+                                    <div class="text-[10px] font-bold text-emerald-800 uppercase mt-0.5">SAT (Eligible)</div>
+                                </div>
+                                <div class="bg-rose-50 border border-rose-200 rounded-lg p-2.5">
+                                    <div id="count-unsat" class="text-2xl font-extrabold text-rose-700">0</div>
+                                    <div class="text-[10px] font-bold text-rose-800 uppercase mt-0.5">UNSAT (Excluded)</div>
+                                </div>
+                                <div class="bg-amber-50 border border-amber-200 rounded-lg p-2.5">
+                                    <div id="count-unknown" class="text-2xl font-extrabold text-amber-700">200</div>
+                                    <div class="text-[10px] font-bold text-amber-800 uppercase mt-0.5">UNKNOWN</div>
+                                </div>
+                            </div>
+
+                            <div class="chart-container mt-2">
+                                <canvas id="simStateChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="bg-indigo-900 text-white rounded-xl p-4 space-y-2 border border-indigo-800">
+                            <div class="text-xs font-bold text-indigo-300 uppercase tracking-wider">Known Patient Partial State</div>
+                            <div id="sim-patient-state" class="text-xs font-mono bg-indigo-950 p-2.5 rounded border border-indigo-800/80 text-indigo-100 leading-relaxed overflow-x-auto">
+                                {}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-research" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 space-y-4">
+                <div>
+                    <span class="inline-block px-2.5 py-1 text-xs font-semibold bg-purple-100 text-purple-800 rounded-full mb-2">Literature Context & Defense</span>
+                    <h2 class="text-2xl font-bold text-slate-900">Research Landscape & Baseline Matrix</h2>
+                    <p class="text-sm text-slate-600 mt-1">Review predecessor papers, identify key baselines for your experiments, and master the exact oral defense against panel questions.</p>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                                <th class="p-3 font-bold">Paper Title</th>
+                                <th class="p-3 font-bold">Year</th>
+                                <th class="p-3 font-bold">Venue</th>
+                                <th class="p-3 font-bold">Role / Relevance in Project</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 text-slate-700">
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-semibold text-slate-900">TrialGPT</td>
+                                <td class="p-3">2024</td>
+                                <td class="p-3">Nat. Commun.</td>
+                                <td class="p-3">Primary LLM-based trial matching baseline. Uses fixed patient info.</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-semibold text-indigo-900">SatIR</td>
+                                <td class="p-3">2026</td>
+                                <td class="p-3">COLM</td>
+                                <td class="p-3">Scalable high-recall constraint-satisfaction retrieval. Major neuro-symbolic predecessor.</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-semibold text-indigo-900">NeSy-CTM</td>
+                                <td class="p-3">2026</td>
+                                <td class="p-3">ArXiv</td>
+                                <td class="p-3">Neurosymbolic clinical trial matching via LLM abduction & logical verification.</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-semibold text-slate-900">Chia</td>
+                                <td class="p-3">2020</td>
+                                <td class="p-3">Sci. Data</td>
+                                <td class="p-3">1,000 annotated clinical trials (12.4k criteria) for training constraint parsing.</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-semibold text-slate-900">EDDI</td>
+                                <td class="p-3">2019</td>
+                                <td class="p-3">ICML</td>
+                                <td class="p-3">Theoretical foundation for efficient dynamic discovery of high-value missing features.</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50">
+                                <td class="p-3 font-semibold text-slate-900">Conformal Risk Control</td>
+                                <td class="p-3">2024</td>
+                                <td class="p-3">ICLR</td>
+                                <td class="p-3">Statistical framework for guaranteeing maximum false-exclusion risk limits.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="bg-rose-50 border border-rose-200 rounded-xl p-5 space-y-3">
+                    <h3 class="text-sm font-bold text-rose-900 flex items-center gap-2">
+                        <span>&#9888;</span> Crucial Caveat for Project Defense (Avoiding Panel Rejection)
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <div class="bg-white p-3 rounded-lg border border-rose-200 space-y-1">
+                            <div class="font-bold text-red-600 uppercase tracking-wider text-[10px]">Do NOT Claim:</div>
+                            <p class="text-slate-700 italic">"We are the first to combine LLMs and SMT logic solvers for clinical trial matching."</p>
+                            <p class="text-slate-500 text-[11px] font-sans">Why? SatIR and NeSy-CTM (2026) have already established basic constraint-based clinical trial matching architectures.</p>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg border border-emerald-200 space-y-1">
+                            <div class="font-bold text-emerald-600 uppercase tracking-wider text-[10px]">DO Claim:</div>
+                            <p class="text-slate-800 font-medium">"While systems like SatIR introduce constraint matching, our contribution is using constraint logic to drive <strong>active, information-optimal conversational questioning</strong> and <strong>statistically safe deferral to human coordinators</strong> when uncertain."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <h3 class="text-base font-bold text-slate-900">Ablation Study Architecture Plan</h3>
+                    <p class="text-xs text-slate-600">To scientifically evaluate your system for your BTP report, construct this incremental ablation table:</p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <div class="font-bold text-slate-800">1. BM25 Baseline</div>
+                            <div class="text-[11px] text-slate-500">Keyword retrieval benchmark</div>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <div class="font-bold text-slate-800">2. Dense / Bi-Encoder</div>
+                            <div class="text-[11px] text-slate-500">Vector similarity benchmark</div>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                            <div class="font-bold text-slate-800">3. TrialGPT Style</div>
+                            <div class="text-[11px] text-slate-500">Standard LLM baseline</div>
+                        </div>
+                        <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-200">
+                            <div class="font-bold text-indigo-900">+ Z3 Constraint Solver</div>
+                            <div class="text-[11px] text-indigo-700">Tests logical accuracy</div>
+                        </div>
+                        <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-200">
+                            <div class="font-bold text-indigo-900">+ Fixed Questions</div>
+                            <div class="text-[11px] text-indigo-700">Conversational baseline</div>
+                        </div>
+                        <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+                            <div class="font-bold text-emerald-900">+ Info-Gain Questions</div>
+                            <div class="text-[11px] text-emerald-700">Tests primary novelty</div>
+                        </div>
+                        <div class="bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+                            <div class="font-bold text-emerald-900">+ Lay Lexicon (CADEC)</div>
+                            <div class="text-[11px] text-emerald-700">Tests patient readability</div>
+                        </div>
+                        <div class="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                            <div class="font-bold text-purple-900">+ Conformal Layer</div>
+                            <div class="text-[11px] text-purple-700">Tests calibrated safety</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-datasets" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 space-y-4">
+                <div>
+                    <span class="inline-block px-2.5 py-1 text-xs font-semibold bg-amber-100 text-amber-800 rounded-full mb-2">Data Resources & Metrics</span>
+                    <h2 class="text-2xl font-bold text-slate-900">Datasets, Evaluation Metrics & APIs</h2>
+                    <p class="text-sm text-slate-600 mt-1">Detailed view of the required corpora, training benchmarks, and quantitative metrics to measure system success.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-6 space-y-4">
+                        <div class="chart-container bg-slate-50 p-4 rounded-xl border border-slate-200">
+                            <canvas id="datasetsChart"></canvas>
+                        </div>
+                        <div class="text-[11px] text-slate-500 text-center italic">
+                            * Note: For reproducible evaluation, strictly keep TREC 2022 corpus isolated as your un-mixed test benchmark.
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-6 space-y-3">
+                        <div class="border border-slate-200 rounded-xl p-3.5 bg-slate-50 space-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-xs text-slate-900">TREC Clinical Trials 2022</span>
+                                <span class="px-2 py-0.5 bg-indigo-100 text-indigo-800 text-[10px] font-bold rounded">Primary Evaluation</span>
+                            </div>
+                            <p class="text-xs text-slate-600">50 official patient topics across 375,581 clinical trial descriptions. Official relevance judgments available.</p>
+                            <div class="text-[11px] text-indigo-700 font-medium">Metrics: NDCG@10, P@10, RPrec, MRR</div>
+                        </div>
+
+                        <div class="border border-slate-200 rounded-xl p-3.5 bg-slate-50 space-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-xs text-slate-900">TREC Clinical Trials 2021</span>
+                                <span class="px-2 py-0.5 bg-slate-200 text-slate-800 text-[10px] font-bold rounded">Dev / Training Set</span>
+                            </div>
+                            <p class="text-xs text-slate-600">75 patient topics. Use exclusively for prompt engineering, logic schema design, and local dev tuning.</p>
+                        </div>
+
+                        <div class="border border-slate-200 rounded-xl p-3.5 bg-slate-50 space-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-xs text-slate-900">Chia Corpus</span>
+                                <span class="px-2 py-0.5 bg-purple-100 text-purple-800 text-[10px] font-bold rounded">Constraint Parsing</span>
+                            </div>
+                            <p class="text-xs text-slate-600">1,000 trials with 12,409 annotated eligibility criteria, 41k entities & 25k relations (negations, scope, temporal, values).</p>
+                        </div>
+
+                        <div class="border border-slate-200 rounded-xl p-3.5 bg-slate-50 space-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-xs text-slate-900">CADEC Lexicon</span>
+                                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded">Layperson Agent</span>
+                            </div>
+                            <p class="text-xs text-slate-600">1,250 patient forum posts mapped to SNOMED CT and MedDRA. Used to format Z3 variables into layperson questions.</p>
+                        </div>
+
+                        <div class="border border-slate-200 rounded-xl p-3.5 bg-slate-50 space-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-xs text-slate-900">ClinicalTrials.gov API v2</span>
+                                <span class="px-2 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded">Live Demo Connector</span>
+                            </div>
+                            <p class="text-xs text-slate-600">Provides live trial IDs, eligibility criteria text, minimum/maximum age, sex, and healthy volunteer status. No API key required.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sec-roadmap" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200/80 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div>
+                        <span class="inline-block px-2.5 py-1 text-xs font-semibold bg-indigo-100 text-indigo-800 rounded-full mb-2">Step-by-Step Execution Plan</span>
+                        <h2 class="text-2xl font-bold text-slate-900">Project Roadmap & Action Checklist</h2>
+                        <p class="text-sm text-slate-600 mt-1">Track your progress week-by-week from foundation setup to final submission.</p>
+                    </div>
+                    <div class="bg-slate-100 p-3 rounded-xl text-right">
+                        <div class="text-xs text-slate-500 font-semibold uppercase">Overall Completion</div>
+                        <div id="roadmap-progress-text" class="text-xl font-bold text-indigo-600">0%</div>
+                    </div>
+                </div>
+
+                <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+                    <div id="roadmap-progress-bar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+                    <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/70 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                            <span class="font-bold text-xs text-indigo-800 uppercase tracking-wider">Phase 1 &bull; Weeks 1-2</span>
+                            <span class="text-[10px] font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">Foundation</span>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-sm">Data Prep & Environment</h3>
+                        <div class="space-y-2 text-xs text-slate-700">
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" onchange="updateRoadmap()" class="task-check mt-0.5 rounded text-indigo-600">
+                                <span>Download TREC CT 2021 & 2022 datasets. Isolate 2022.</span>
+                            </label>
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" onchange="updateRoadmap()" class="task-check mt-0.5 rounded text-indigo-600">
+                                <span>Download Chia & CADEC corpora for constraint evaluation.</span>
+                            </label>
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" onchange="updateRoadmap()" class="task-check mt-0.5 rounded text-indigo-600">
+                                <span>Setup Python venv: <code>z3-solver</code>, <code>rank_bm25</code>, <code>langchain</code>.</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/70 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                            <span class="font-bold text-xs text-indigo-800 uppercase tracking-wider">Phase 2 &bull; Weeks 3-5</span>
+                            <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">MVP Milestone</span>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-sm">3-Valued Logic Engine</h3>
+                        <div class="space-y-2 text-xs text-slate-700">
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" onchange="updateRoadmap()" class="task-check mt-0.5 rounded text-indigo-600">
+                                <span>Write LLM prompt to convert criteria into JSON constraints.</span>
+                            </label>
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" onchange="updateRoadmap()" class="task-check mt-0.5 rounded text-indigo-600">
+                                <span>Build Python Z3 variable mapper (numerical, boolean, temporal).</span>
+                            </label>
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" onchange="updateRoadmap()" class="task-check mt-0.5 rounded text-indigo-600">
+                                <span>Validate logic output: SAT, UNSAT, UNKNOWN on fake profiles.</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/70 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                            <span class="font-bold text-xs text-indigo-800 uppercase tracking-wider">Phase 3 &bull; Weeks 6-7</span>
+                            <span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded">Retrieval</span>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-sm">Initial Retrieval Pipeline</h3>
+                        <div class="space-y-2 text-xs text-slate-700">
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" onchange="updateRoadmap()" class="task-check mt-0.5 rounded text-indigo-600">
+                                <span>Index TREC CT 2021 corpus using BM25 / MedCPT.</span>
+                            </label>
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" onchange="updateRoadmap()" class="task-check mt-0.5 rounded text-indigo-600">
+                                <span>Retrieve top 200 candidate trials per patient topic query.</span>
+                            </label>
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" onchange="updateRoadmap()" class="task-check mt-0.5 rounded text-indigo-600">
+                                <span>Build disk cache for formal JSON constraints to minimize API costs.</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/70 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                            <span class="font-bold text-xs text-indigo-800 uppercase tracking-wider">Phase 4 &bull; Weeks 8-9</span>
+                            <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">Core Novelty</span>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-sm">Active Info Gain Agent</h3>
+                        <div class="space-y-2 text-xs text-slate-700">
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" onchange="updateRoadmap()" class="task-check mt-0.5 rounded text-indigo-600">
+                                <span>Extract list of missing variables across unresolved UNKNOWN trials.</span>
+                            </label>
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" onchange="updateRoadmap()" class="task-check mt-0.5 rounded text-indigo-600">
+                                <span>Implement greedy Information-Gain solver algorithm.</span>
+                            </label>
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" onchange="updateRoadmap()" class="task-check mt-0.5 rounded text-indigo-600">
+                                <span>Integrate CADEC layperson mapper for human-friendly questions.</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/70 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                            <span class="font-bold text-xs text-indigo-800 uppercase tracking-wider">Phase 5 &bull; Weeks 10-12</span>
+                            <span class="text-[10px] font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded">Evaluation</span>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-sm">Benchmark Experiments</h3>
+                        <div class="space-y-2 text-xs text-slate-700">
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" onchange="updateRoadmap()" class="task-check mt-0.5 rounded text-indigo-600">
+                                <span>Run evaluation on TREC 2022 test benchmark.</span>
+                            </label>
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" onchange="updateRoadmap()" class="task-check mt-0.5 rounded text-indigo-600">
+                                <span>Evaluate baselines: BM25, Dense Siamese, TrialGPT LLM.</span>
+                            </label>
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" onchange="updateRoadmap()" class="task-check mt-0.5 rounded text-indigo-600">
+                                <span>Generate full ablation matrix (NDCG@10, P@10, False Exclusion Rate).</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/70 space-y-3">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                            <span class="font-bold text-xs text-indigo-800 uppercase tracking-wider">Phase 6 &bull; Weeks 13-14</span>
+                            <span class="text-[10px] font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded">Final Polish</span>
+                        </div>
+                        <h3 class="font-bold text-slate-900 text-sm">UI, Conformal & Submission</h3>
+                        <div class="space-y-2 text-xs text-slate-700">
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" onchange="updateRoadmap()" class="task-check mt-0.5 rounded text-indigo-600">
+                                <span>Build interactive Chat UI (Streamlit or Gradio).</span>
+                            </label>
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" onchange="updateRoadmap()" class="task-check mt-0.5 rounded text-indigo-600">
+                                <span>Connect ClinicalTrials.gov API v2 for live trial demonstration.</span>
+                            </label>
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" onchange="updateRoadmap()" class="task-check mt-0.5 rounded text-indigo-600">
+                                <span>(Optional) Implement Conformal Risk Control statistical layer.</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 text-xs py-4 border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div>
+                <span class="font-bold text-slate-200">Ask What Matters:</span> Neuro-Symbolic Clinical Trial Screening System
+            </div>
+            <div class="text-[11px] text-slate-500">
+                Single-Page Interactive Application &bull; BTP Brief Synthesis
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const archData = {
+            1: {
+                title: "Step 1: Clinical Trials Criteria Acquisition",
+                badge: "Data Layer",
+                desc: "Fetches natural language eligibility criteria from ClinicalTrials.gov API v2 or local TREC CT benchmarks.",
+                tech: "ClinicalTrials.gov API v2 / TREC CT XML / Chia Dataset",
+                code: "{\n  \"nct_id\": \"NCT04882150\",\n  \"eligibility_text\": \"Inclusion: Age 18-64, BMI 18-38, HbA1c <= 9.0%, specific insulin dosage for >= 60 days...\"\n}"
+            },
+            2: {
+                title: "Step 2: Initial Retrieval Stage",
+                badge: "Information Retrieval",
+                desc: "Because directly evaluating 375k+ trials using SMT solving is computationally prohibitive, standard IR narrows the candidate pool to ~200 trials.",
+                tech: "BM25 (Rank-BM25) / MedCPT Bi-Encoder",
+                code: "candidates = bm25.get_top_n(patient_query, trial_corpus, n=200)"
+            },
+            3: {
+                title: "Step 3: LLM Autoformalization",
+                badge: "LLM Parser Layer",
+                desc: "Converts free-text inclusion and exclusion criteria into structured logical rules represented as AST/JSON constraints.",
+                tech: "GPT-4 / Claude-3 / Llama-3 + Structured Prompting",
+                code: "{\n  \"age\": {\"min\": 18, \"max\": 64},\n  \"hba1c\": {\"op\": \"<=\", \"val\": 9.0},\n  \"egfr\": {\"op\": font_\">=\", \"val\": 60},\n  \"conditions\": [\"Type 2 Diabetes\"]\n}"
+            },
+            4: {
+                title: "Step 4: Z3 SMT Constraint Solving",
+                badge: "Symbolic Reasoning",
+                desc: "Passes the currently known patient state into Z3 SMT Solver. Evaluates candidates into SAT (potentially eligible), UNSAT (confidently excluded), or UNKNOWN (insufficient patient data).",
+                tech: "Z3 SMT Solver (Python z3-solver)",
+                code: "solver = z3.Solver()\nsolver.add(patient_age >= 18, patient_age <= 64)\nsolver.add(patient_hba1c <= 9.0)\nresult = solver.check() # SAT, UNSAT, or UNKNOWN"
+            },
+            5: {
+                title: "Step 5: Information Gain Active Questioning",
+                badge: "Conversational Agent",
+                desc: "Extracts all unresolved variables across UNKNOWN trials. Calculates which missing variable resolves the maximum number of UNKNOWN states into SAT/UNSAT, and asks the patient in lay language.",
+                tech: "EDDI Information Gain Engine + CADEC Lexicon",
+                code: "# Variable Yield Calculation\neGFR_yield = 30 # resolves 30 UNKNOWNs\nHbA1c_yield = 12 # resolves 12 UNKNOWNs\n-> Ask eGFR question first!"
+            },
+            6: {
+                title: "Step 6: Risk-Controlled Decision & Human Referral",
+                badge: "Safety Deferral Layer",
+                desc: "Uses Conformal Risk Control to statistically bound false-exclusion risk. When uncertainty remains high or maximum questions are reached, defers SAT/UNKNOWN lists to human trial coordinator.",
+                tech: "Conformal Risk Control / Human-in-the-Loop Hand-off",
+                code: "if remaining_unknown > threshold:\n  refer_to_human(sat_trials, unresolved_constraints)"
+            }
+        };
+
+        function selectArchStep(stepId) {
+            for (let i = 1; i <= 6; i++) {
+                const node = document.getElementById(`arch-node-${i}`);
+                if (node) {
+                    node.classList.remove('border-indigo-500', 'bg-slate-750', 'ring-2', 'ring-indigo-500/50');
+                    node.classList.add('border-slate-700');
+                }
+            }
+            const activeNode = document.getElementById(`arch-node-${stepId}`);
+            if (activeNode) {
+                activeNode.classList.remove('border-slate-700');
+                activeNode.classList.add('border-indigo-500', 'bg-slate-750', 'ring-2', 'ring-indigo-500/50');
+            }
+
+            const data = archData[stepId];
+            const container = document.getElementById('arch-detail-container');
+            container.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-indigo-700 uppercase tracking-wider">${data.badge}</span>
+                    <span class="text-[10px] bg-slate-200 text-slate-700 px-2 py-0.5 rounded font-mono">Step ${stepId}</span>
+                </div>
+                <h4 class="text-lg font-bold text-slate-900">${data.title}</h4>
+                <p class="text-xs text-slate-600 leading-relaxed">${data.desc}</p>
+                <div class="pt-1">
+                    <div class="text-[11px] font-bold text-slate-700">Technology Stack:</div>
+                    <div class="text-xs font-mono text-indigo-900 bg-indigo-50 p-2 rounded border border-indigo-100 mt-1">${data.tech}</div>
+                </div>
+                <div class="pt-1">
+                    <div class="text-[11px] font-bold text-slate-700">Payload / Logic Representation:</div>
+                    <pre class="text-[10px] font-mono bg-slate-900 text-emerald-400 p-3 rounded-lg overflow-x-auto border border-slate-800 mt-1">${data.code}</pre>
+                </div>
+            `;
+        }
+
+        const simSteps = [
+            {
+                step: 0,
+                sat: 0,
+                unsat: 0,
+                unknown: 200,
+                state: {},
+                prompt: "Patient initializes screening agent with basic input: '55yo male, Type 2 Diabetes'.",
+                msg: { role: "system", text: "Welcome! Initial patient state captured: Age 55, Male, Type 2 Diabetes. Executing BM25 retrieval across TREC CT trial corpus..." },
+                actions: [
+                    { text: "Run Initial BM25 Retrieval (~200 Trials)", next: 1 }
+                ]
+            },
+            {
+                step: 1,
+                sat: 10,
+                unsat: 40,
+                unknown: 150,
+                state: { age: 55, sex: "M", condition: "Type 2 Diabetes" },
+                prompt: "BM25 retrieved 200 trials. Z3 solver evaluated known age/sex logic: 10 SAT, 40 UNSAT, 150 UNKNOWN. Calculating highest information-gain question...",
+                msg: { role: "agent", text: "Question 1 (Yield: 30 trials): 'Have you had a kidney function test (eGFR) within the last 6 months?'" },
+                actions: [
+                    { text: "Yes, eGFR is 95 (Normal)", next: 2, answer: "eGFR = 95" },
+                    { text: "Yes, eGFR is 45 (Impaired)", next: 2, answer: "eGFR = 45" },
+                    { text: "Don't Know", next: 2, answer: "eGFR = NULL" }
+                ]
+            },
+            {
+                step: 2,
+                sat: 45,
+                unsat: 105,
+                unknown: 50,
+                state: { age: 55, sex: "M", condition: "Type 2 Diabetes", eGFR: 95 },
+                prompt: "Z3 solver re-evaluated eGFR=95. 55 UNKNOWN trials resolved into 35 SAT and 20 UNSAT. Calculating next highest information-gain question...",
+                msg: { role: "agent", text: "Question 2 (Yield: 25 trials): 'What is your current HbA1c level?'" },
+                actions: [
+                    { text: "HbA1c is 8.2%", next: 3, answer: "HbA1c = 8.2" },
+                    { text: "Don't Know / Unsure", next: 3, answer: "HbA1c = NULL" }
+                ]
+            },
+            {
+                step: 3,
+                sat: 60,
+                unsat: 125,
+                unknown: 15,
+                state: { age: 55, sex: "M", condition: "Type 2 Diabetes", eGFR: 95, HbA1c: "NULL" },
+                prompt: "Maximum questions reached / Risk threshold met. Dynamic active questioning complete.",
+                msg: { role: "system", text: "Safe Referral Triggered: 60 Trials SAT (Eligible), 125 UNSAT (Excluded), 15 UNKNOWN (Flagged for human review). Packet dispatched to Clinical Coordinator." },
+                actions: [
+                    { text: "Reset Demo", next: 0 }
+                ]
+            }
+        ];
+
+        let currentSimIndex = 0;
+        let simStateChartInstance = null;
+
+        function updateSimUI(stepObj) {
+            document.getElementById('sim-step-badge').innerText = `Step ${stepObj.step} / 3`;
+            document.getElementById('count-sat').innerText = stepObj.sat;
+            document.getElementById('count-unsat').innerText = stepObj.unsat;
+            document.getElementById('count-unknown').innerText = stepObj.unknown;
+            document.getElementById('sim-patient-state').innerText = JSON.stringify(stepObj.state, null, 2);
+            document.getElementById('sim-prompt-label').innerText = stepObj.prompt;
+
+            const chatBox = document.getElementById('sim-chat-box');
+            if (stepObj.step === 0) {
+                chatBox.innerHTML = `<div class="bg-slate-800 text-slate-200 p-3 rounded-lg border border-slate-700">${stepObj.msg.text}</div>`;
+            } else {
+                const isAgent = stepObj.msg.role === 'agent';
+                const msgHtml = isAgent
+                    ? `<div class="bg-indigo-950 text-indigo-100 p-3 rounded-lg border border-indigo-800 font-medium"><strong>Agent:</strong> ${stepObj.msg.text}</div>`
+                    : `<div class="bg-slate-800 text-emerald-300 p-3 rounded-lg border border-slate-700"><strong>System:</strong> ${stepObj.msg.text}</div>`;
+                chatBox.innerHTML += msgHtml;
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            const actionsContainer = document.getElementById('sim-actions-container');
+            actionsContainer.innerHTML = '';
+            stepObj.actions.forEach(act => {
+                const btn = document.createElement('button');
+                btn.className = "text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-lg shadow transition border border-indigo-400";
+                btn.innerText = act.text;
+                btn.onclick = () => {
+                    if (act.answer) {
+                        const chatBox = document.getElementById('sim-chat-box');
+                        chatBox.innerHTML += `<div class="bg-slate-800 text-slate-300 p-2.5 rounded-lg border border-slate-700 text-right"><strong>Patient:</strong> ${act.answer}</div>`;
+                    }
+                    currentSimIndex = act.next;
+                    updateSimUI(simSteps[currentSimIndex]);
+                };
+                actionsContainer.appendChild(btn);
+            });
+
+            if (simStateChartInstance) {
+                simStateChartInstance.data.datasets[0].data = [stepObj.sat, stepObj.unsat, stepObj.unknown];
+                simStateChartInstance.update();
+            }
+        }
+
+        function resetDemoSimulator() {
+            currentSimIndex = 0;
+            updateSimUI(simSteps[0]);
+        }
+
+        function initSimChart() {
+            const ctx = document.getElementById('simStateChart').getContext('2d');
+            simStateChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['SAT (Eligible)', 'UNSAT (Excluded)', 'UNKNOWN (Missing Info)'],
+                    datasets: [{
+                        data: [0, 0, 200],
+                        backgroundColor: ['#10b981', '#f43f5e', '#f59e0b'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { boxWidth: 12, font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initDatasetsChart() {
+            const ctx = document.getElementById('datasetsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['TREC CT 2021', 'TREC CT 2022', 'Chia Dataset', 'CADEC Lexicon'],
+                    datasets: [{
+                        label: 'Record Scale (Queries / Trials / Posts / Criteria)',
+                        data: [75, 50, 1000, 1250],
+                        backgroundColor: ['#6366f1', '#4f46e5', '#a855f7', '#10b981'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: true, text: 'Evaluation & Training Corpora Scale', font: { size: 12, weight: 'bold' } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function updateRoadmap() {
+            const checks = document.querySelectorAll('.task-check');
+            let checkedCount = 0;
+            checks.forEach(c => { if (c.checked) checkedCount++; });
+            const pct = Math.round((checkedCount / checks.length) * 100);
+            document.getElementById('roadmap-progress-bar').style.width = pct + '%';
+            document.getElementById('roadmap-progress-text').innerText = pct + '%';
+        }
+
+        function switchTab(tabId) {
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(c => c.classList.add('hidden'));
+
+            const navBtns = document.querySelectorAll('.nav-btn');
+            navBtns.forEach(b => {
+                b.classList.remove('bg-indigo-700', 'text-white', 'shadow-sm');
+                b.classList.add('text-indigo-200');
+            });
+
+            const activeTab = document.getElementById(`sec-${tabId}`);
+            if (activeTab) activeTab.classList.remove('hidden');
+
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-indigo-700', 'text-white', 'shadow-sm');
+                activeBtn.classList.remove('text-indigo-200');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            selectArchStep(1);
+            initSimChart();
+            initDatasetsChart();
+            updateSimUI(simSteps[0]);
+            updateRoadmap();
+        });
+    </script>
+</body>
+</html>
